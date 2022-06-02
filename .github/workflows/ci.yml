@@ -1,0 +1,160 @@
+# Continuous integration testing for ChRIS Plugin.
+# https://github.com/FNNDSC/cookiecutter-chrisapp/wiki/Automatic-Builds
+#
+# - automatically run pytest
+# - on push to main, build and push container images as ":latest"
+# - on release, build and push container image with tag and
+#   upload plugin description to https://chrisstore.co
+
+name: build
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  release:
+    types: [ published ]
+
+jobs:
+  test:
+    name: Unit tests
+    if: false  # CI disabled by default, delete this line
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+      - uses: docker/setup-buildx-action@v1
+      - name: Cache Docker layers
+        uses: actions/cache@v2
+        with:
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-buildx-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-buildx-
+      - name: Build
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          load: true
+          push: false
+          tags: "localhost/local/app:latest"
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,dest=/tmp/.buildx-cache
+      - name: Install testing dependencies
+        run: |
+          docker run --name=install_test localhost/local/app:latest pip install pytest
+          docker commit install_test localhost/local/app:tester
+          docker rm install_test
+      - name: Run pytest
+        run: |
+          docker run -v "$GITHUB_WORKSPACE:/app:ro" -w /app localhost/local/app:tester \
+            pytest -o cache_dir=/tmp/pytest
+
+  build:
+    name: Build
+    needs: [ test ]  # tests must pass before build
+    if: github.event_name == 'push' || github.event_name == 'release'
+    runs-on: ubuntu-20.04
+
+    # A local registry helps us reuse the built image between steps
+    services:
+      registry:
+        image: registry:2
+        ports:
+          - 5000:5000
+
+    steps:
+      - name: Get git tag
+        id: git_info
+        if: startsWith(github.ref, 'refs/tags/')
+        run: echo "::set-output name=tag::${GITHUB_REF##*/}"
+      - name: Get project info
+        id: determine
+        env:
+          git_tag: ${{ steps.git_info.outputs.tag }}
+        run: |
+          repo="${GITHUB_REPOSITORY,,}"  # to lower case
+          # if build triggered by tag, use tag name
+          tag="${git_tag:-latest}"
+
+          # if tag is a version number prefixed by 'v', remove the 'v'
+          if [[ "$tag" =~ ^v[0-9].* ]]; then
+            tag="${tag:1}"
+          fi
+
+          dock_image=$repo:$tag
+          echo $dock_image
+          echo "::set-output name=dock_image::$dock_image"
+          echo "::set-output name=repo::$repo"
+
+      - uses: actions/checkout@v2
+        # QEMU is used for non-x86_64 builds
+      - uses: docker/setup-qemu-action@v1
+        # buildx adds additional features to docker build
+      - uses: docker/setup-buildx-action@v1
+        with:
+          driver-opts: network=host
+        # cache slightly improves rebuild time
+      - name: Cache Docker layers
+        uses: actions/cache@v2
+        with:
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-buildx-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-buildx-
+
+      - name: Login to DockerHub
+        id: dockerhub_login
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+          
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v1 
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push
+        uses: docker/build-push-action@v2
+        id: docker_build
+        with:
+          context: .
+          file: ./Dockerfile
+          tags: |
+            localhost:5000/${{ steps.determine.outputs.dock_image }}
+            docker.io/${{ steps.determine.outputs.dock_image }}
+            ghcr.io/${{ steps.determine.outputs.dock_image }}
+          # if non-x86_84 architectures are supported, add them here
+          platforms: linux/amd64  #,linux/arm64,linux/ppc64le
+          push: true
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,dest=/tmp/.buildx-cache
+
+      - name: Get plugin meta
+        id: pluginmeta
+        run: |
+          repo=${{ steps.determine.outputs.repo }}
+          dock_image=${{ steps.determine.outputs.dock_image }}
+          docker run --rm localhost:5000/$dock_image chris_plugin_info > /tmp/description.json
+          jq < /tmp/description.json  # pretty print in log
+          echo "::set-output name=title::$(jq -r '.title' < /tmp/description.json)"
+
+      - name: Update DockerHub description
+        uses: peter-evans/dockerhub-description@v2
+        continue-on-error: true  # it is not crucial that this works
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+          short-description: ${{ steps.pluginmeta.outputs.title }}
+          readme-filepath: ./README.md
+          repository: ${{ steps.determine.outputs.repo }}
+
+      - name: Upload to ChRIS Store
+        if: github.event_name == 'release'
+        uses: FNNDSC/chrisstore-action@master
+        with:
+          descriptor_file: /tmp/description.json
+          auth: ${{ secrets.CHRIS_STORE_USER }}

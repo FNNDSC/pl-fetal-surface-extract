@@ -1,0 +1,11 @@
+*~
+*.DS_Store
+*.egg-info/
+__pycache__/
+
+.docker
+
+.idea/
+.vscode/
+
+venv/
