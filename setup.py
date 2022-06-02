@@ -1,19 +1,19 @@
 from setuptools import setup
 
 setup(
-    name='chris-plugin-template',
-    version='1.0.0',
-    description='A ChRIS DS plugin template',
-    author='FNNDSC',
-    author_email='dev@babyMRI.org',
-    url='https://github.com/FNNDSC/python-chrisapp-template',
-    py_modules=['app'],
+    name='fetal-cp-surface-extract',
+    version='0.1.0',
+    description='Fetal brain MRI CP surface extraction using CIVET marching-cubes',
+    author='Jennings Zhang',
+    author_email='Jennings.Zhang@childrens.harvard.edu',
+    url='https://github.com/FNNDSC/pl-fetal-cp-surface-extract',
+    py_modules=['extract_cp'],
     install_requires=['chris_plugin'],
     license='MIT',
-    python_requires='>=3.8.2',
+    python_requires='>=3.10.4',
     entry_points={
         'console_scripts': [
-            'commandname = app:main'
+            'extract_cp = extract_cp:main'
         ]
     },
     classifiers=[

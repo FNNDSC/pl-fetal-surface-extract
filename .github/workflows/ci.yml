@@ -19,7 +19,6 @@ on:
 jobs:
   test:
     name: Unit tests
-    if: false  # CI disabled by default, delete this line
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
