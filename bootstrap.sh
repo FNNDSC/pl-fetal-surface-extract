@@ -8,9 +8,9 @@
 # Step 1. Change these values to your liking.
 
 PLUGIN_NAME="$(basename $(dirname $(realpath $0)))"
-PLUGIN_TITLE='My ChRIS Plugin'
-SCRIPT_NAME='commandname'
-DESCRIPTION='A ChRIS plugin to do something awesome'
+PLUGIN_TITLE='Fetal CP Surface Extraction'
+SCRIPT_NAME='extract_cp'
+DESCRIPTION='Fetal brain MRI CP surface extraction using CIVET marching-cubes'
 ORGANIZATION='FNNDSC'
 EMAIL='dev@babyMRI.org'
 
@@ -20,7 +20,7 @@ ENABLE_CI=yes
 
 # Step 2. Uncomment the line below.
 
-#READY=yes
+READY=yes
 
 # Step 3. Run: ./bootstrap.sh
 
@@ -153,7 +153,7 @@ mv $temp_file setup.py
 
 # FIGlet over HTTPS, since it's probably not installed locally
 function figlet_wrapper () {
-  curl -fsSG 'https://figlet.moc.chrisproject.org/' --data-urlencode "message=$*" \
+  curl -fsSG 'https://figlet.chrisproject.org/' --data-urlencode "message=$*" \
     | grep -v '^[[:space:]]*$'
 }
 
@@ -167,7 +167,7 @@ for line in open('app.py'):
 EOF
 }
 
-figleted_title="$(figlet_wrapper "$PLUGIN_NAME")"
+figleted_title="$(figlet_wrapper 'Fetal CP Surface Extraction')"
 echo "$figleted_title"
 inject_figleted_title "$figleted_title" \
   | sed "s/title='My ChRIS plugin'/title='$escaped_title'/" \
