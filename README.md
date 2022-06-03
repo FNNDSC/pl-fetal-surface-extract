@@ -91,6 +91,17 @@ To print its available options, run:
 apptainer exec docker://fnndsc/pl-fetal-cp-surface-extract extract_cp --help
 ```
 
+## Suggested Software
+
+### Before `pl-fetal-cp-surface-extract`
+
+- [`pl-nums2mask`](https://chrisstore.co/plugin/pl-nums2mask): create input masks
+
+### After `pl-fetal-cp-surface-extract`
+
+- [`pl-surfdisterr`](https://chrisstore.co/plugin/pl-surfdisterr): QC
+- [`pl-smoothness-error`](https://chrisstore.co/plugin/pl-smoothness-error): QC
+
 ## Development
 
 Instructions for developers.
