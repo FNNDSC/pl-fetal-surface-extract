@@ -1,3 +1,4 @@
+# warning: unofficial base image is not stable and may change in the future!
 FROM docker.io/fnndsc/mni-conda-base:unofficial
 
 LABEL org.opencontainers.image.authors="Jennings Zhang <Jennings.Zhang@childrens.harvard.edu>" \
