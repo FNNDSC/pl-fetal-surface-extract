@@ -79,16 +79,16 @@ values shouldn't do any harm, and would help compensate for larger brain sizes.
 ## Local Usage
 
 To get started with local command-line usage, use [Apptainer](https://apptainer.org/)
-(a.k.a. Singularity) to run `pl-fetal-cp-surface-extract` as a container:
+to run `pl-fetal-cp-surface-extract` as a container:
 
 ```shell
-singularity exec docker://fnndsc/pl-fetal-cp-surface-extract extract_cp input/ output/
+apptainer exec docker://fnndsc/pl-fetal-cp-surface-extract extract_cp input/ output/
 ```
 
 To print its available options, run:
 
 ```shell
-singularity exec docker://fnndsc/pl-fetal-cp-surface-extract extract_cp --help
+apptainer exec docker://fnndsc/pl-fetal-cp-surface-extract extract_cp --help
 ```
 
 ## Development
@@ -122,4 +122,3 @@ docker run --rm -it --userns=host -u $(id -u):$(id -g) \
     -v $PWD/in:/incoming:ro -v $PWD/out:/outgoing:rw -w /outgoing \
     localhost/fnndsc/pl-fetal-cp-surface-extract extract_cp /incoming /outgoing
 ```
-
