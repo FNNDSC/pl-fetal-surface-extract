@@ -14,5 +14,6 @@ __pycache__/
 .vscode/
 
 examples/
+docs/
 
 venv/

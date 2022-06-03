@@ -6,14 +6,15 @@
 
 Fetal brain cortical plate surface extraction using CIVET marching-cubes (`sphere_mesh`).
 
-**TODO add a figure here of screenshots.**
+![Figure](docs/fig.png)
 
 ## Abstract
 
 `pl-fetal-cp-surface-extract` consumes binary volumetric `.mnc` brain masks to produce
-surfaces as `.obj` files. This program is suitable for targeting the **inner cortical plate**
-surface (gray-white matter boundary) of high-quality human fetal brain MRI segmentation
-for subjects between 23-35 gestational weeks of age.
+surfaces as `.obj` files with standard connectivity (81,920 triangles). This program is
+suitable for targeting the **inner cortical plate** surface (gray-white matter boundary)
+of high-quality human fetal brain MRI segmentation for subjects between 23-35 gestational
+weeks of age.
 
 ## Background
 
@@ -46,6 +47,34 @@ value of `1`, background value should be `0`.
 
 If the input directory contains multiple masks, they will all be processed
 individually and in parallel.
+
+### Options
+
+#### `--mincmorph-iterations`
+
+Number of `mincmorph` iterations to perform on the mask before marching-cubes.
+Use a larger value as a workaround for masks which have missing voxels. However,
+extremely bad masks will require external correction, for instance, using `mincdefrag`.
+_Garbage in, garbage out_.
+
+```shell
+extract_cp --mincmorph-iterations 10 /incoming /outgoing
+```
+
+#### `--adapt_object_mesh`
+
+Arguments to pass to `adapt_object_mesh`, which does mesh smoothing.
+Use a larger value if the results are bumpy/voxelated in appearance.
+
+```shell
+extract_cp --adapt_object_mesh 1,100,1 /incoming /outgoing
+```
+
+#### `--inflate_to_sphere_implicit`
+
+Arguments to pass to `inflate_to_sphere_implicit`. The default value `(200, 200)`
+should work for fetal brains. While it shouldn't be necessary, increasing the
+values shouldn't do any harm, and would help compensate for larger brain sizes.
 
 ## Local Usage
 
