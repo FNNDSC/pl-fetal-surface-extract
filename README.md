@@ -89,7 +89,7 @@ Mount the source code `extract_cp.py` into a container to test changes without r
 
 ```shell
 docker run --rm -it --userns=host -u $(id -u):$(id -g) \
-    -v $PWD/extract_cp:/usr/local/lib/python3.10/site-packages/extract_cp:ro \
+    -v $PWD/extract_cp:/opt/conda/lib/python3.10/site-packages/extract_cp:ro \
     -v $PWD/in:/incoming:ro -v $PWD/out:/outgoing:rw -w /outgoing \
     localhost/fnndsc/pl-fetal-cp-surface-extract extract_cp /incoming /outgoing
 ```
