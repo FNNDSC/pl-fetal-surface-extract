@@ -5,6 +5,8 @@ from civet.extraction.hemisphere import Side, HemisphereMask
 import subprocess as sp
 from loguru import logger
 
+import extract_cp.constants as constants
+
 SIDE_OPTIONS = ('left', 'right', 'auto', 'none')
 SideStr = Literal['left', 'right', 'auto', 'none']
 
@@ -20,7 +22,7 @@ def extract_surface(mask: Path, surface: Path, side: SideStr):
             HemisphereMask(mask)\
                 .smoothen_using_mincmorph()\
                 .just_sphere_mesh(chosen_side, subsample=True)\
-                .interpolate_with_sphere(chosen_side)\
+                .interpolate_with_sphere(chosen_side, n_inflate=constants.N_INFLATE, n_smooth=constants.N_SMOOTH)\
                 .save(surface, shell=__curry_log(log))
         logger.info('Completed {}', surface)
     except Exception as e:
