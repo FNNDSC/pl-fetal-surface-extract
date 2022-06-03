@@ -17,41 +17,8 @@ on:
     types: [ published ]
 
 jobs:
-  test:
-    name: Unit tests
-    runs-on: ubuntu-20.04
-    steps:
-      - uses: actions/checkout@v2
-      - uses: docker/setup-buildx-action@v1
-      - name: Cache Docker layers
-        uses: actions/cache@v2
-        with:
-          path: /tmp/.buildx-cache
-          key: ${{ runner.os }}-buildx-${{ github.sha }}
-          restore-keys: |
-            ${{ runner.os }}-buildx-
-      - name: Build
-        uses: docker/build-push-action@v2
-        with:
-          context: .
-          load: true
-          push: false
-          tags: "localhost/local/app:latest"
-          cache-from: type=local,src=/tmp/.buildx-cache
-          cache-to: type=local,dest=/tmp/.buildx-cache
-      - name: Install testing dependencies
-        run: |
-          docker run --name=install_test localhost/local/app:latest pip install pytest
-          docker commit install_test localhost/local/app:tester
-          docker rm install_test
-      - name: Run pytest
-        run: |
-          docker run -v "$GITHUB_WORKSPACE:/app:ro" -w /app localhost/local/app:tester \
-            pytest -o cache_dir=/tmp/pytest
-
   build:
     name: Build
-    needs: [ test ]  # tests must pass before build
     if: github.event_name == 'push' || github.event_name == 'release'
     runs-on: ubuntu-20.04
 
