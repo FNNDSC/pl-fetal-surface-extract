@@ -46,7 +46,7 @@ def main(options: Namespace, inputdir: Path, outputdir: Path):
     print(params, file=sys.stderr, flush=True)
 
     with ThreadPoolExecutor(max_workers=len(os.sched_getaffinity(0))) as pool:
-        mapper = PathMapper.file_mapper(inputdir, outputdir, glob=options.pattern, suffix='.obj')
+        mapper = PathMapper.file_mapper(inputdir, outputdir, glob=options.pattern, suffix='._81920.obj')
         results = pool.map(lambda t: extract_surface(*t, params=params), mapper)
 
     if not options.no_fail:
