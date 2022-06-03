@@ -1,28 +1,26 @@
 import os
 from pathlib import Path
-from typing import Optional, Literal, Sequence, BinaryIO
+from typing import Optional, Sequence, BinaryIO
 from civet.extraction.hemisphere import Side, HemisphereMask
 import subprocess as sp
 from loguru import logger
 
-import extract_cp.constants as constants
-
-SIDE_OPTIONS = ('left', 'right', 'auto', 'none')
-SideStr = Literal['left', 'right', 'auto', 'none']
+from extract_cp.params import SideStr, SIDE_OPTIONS, Parameters
 
 __log_prefix = b'[' + os.path.basename(__file__).encode(encoding='utf-8') + b']$> '
 
 
-def extract_surface(mask: Path, surface: Path, side: SideStr):
+def extract_surface(mask: Path, surface: Path, params: Parameters):
     log_path = surface.with_suffix('.extraction.log')
     try:
-        chosen_side = __pick_side(mask, side)
+        chosen_side = __pick_side(mask, params.side)
         logger.info('Processing {} to {}, log: {}', mask, surface, log_path)
         with log_path.open('wb') as log:
             HemisphereMask(mask)\
-                .smoothen_using_mincmorph()\
+                .smoothen_using_mincmorph(iterations=params.mincmorph_iterations)\
                 .just_sphere_mesh(chosen_side, subsample=True)\
-                .interpolate_with_sphere(chosen_side, n_inflate=constants.N_INFLATE, n_smooth=constants.N_SMOOTH)\
+                .adapt_object_mesh(*params.adapt_object_mesh)\
+                .interpolate_with_sphere(chosen_side, *params.inflate_to_sphere_implicit)\
                 .save(surface, shell=__curry_log(log))
         logger.info('Completed {}', surface)
     except Exception as e:
