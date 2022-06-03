@@ -15,6 +15,17 @@ surfaces as `.obj` files. This program is suitable for targeting the **inner cor
 surface (gray-white matter boundary) of high-quality human fetal brain MRI segmentation
 for subjects between 23-35 gestational weeks of age.
 
+## Background
+
+Polygonal surface mesh representations of brain hemispheres are useful for measuring cortical
+thickness, image registration, and quantitative regional analysis.
+
+## Surface Extraction Algorithm
+
+1. Proprocess mask using `mincmorph` to fill in disconnected voxels (improve mask quality)
+2. Marching-cubes -> spherical topology surface mesh with unknown number of triangles
+3. Sphere-to-sphere interpolation -> resample mesh to standard connectivity of 81,920 triangles, preserving morphology
+
 ## Installation
 
 `pl-fetal-cp-surface-extract` is a _[ChRIS](https://chrisproject.org/) plugin_, meaning it can
@@ -78,7 +89,8 @@ Mount the source code `extract_cp.py` into a container to test changes without r
 
 ```shell
 docker run --rm -it --userns=host -u $(id -u):$(id -g) \
-    -v $PWD/extract_cp.py:/usr/local/lib/python3.10/site-packages/extract_cp.py:ro \
+    -v $PWD/extract_cp:/usr/local/lib/python3.10/site-packages/extract_cp:ro \
     -v $PWD/in:/incoming:ro -v $PWD/out:/outgoing:rw -w /outgoing \
     localhost/fnndsc/pl-fetal-cp-surface-extract extract_cp /incoming /outgoing
 ```
+
