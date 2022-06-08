@@ -1,4 +1,5 @@
 import os
+import shutil
 from pathlib import Path
 from typing import Optional, Sequence, BinaryIO
 from civet.extraction.hemisphere import Side, HemisphereMask
@@ -22,6 +23,8 @@ def extract_surface(mask: Path, surface: Path, params: Parameters):
                 .adapt_object_mesh(*params.adapt_object_mesh)\
                 .interpolate_with_sphere(chosen_side, *params.inflate_to_sphere_implicit)\
                 .save(surface, shell=__curry_log(log))
+        if params.keep_mask:
+            shutil.copy(mask, surface.with_name(mask.name))
         logger.info('Completed {}', surface)
     except Exception as e:
         logger.exception('Failed to process {}', mask)

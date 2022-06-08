@@ -76,6 +76,13 @@ Arguments to pass to `inflate_to_sphere_implicit`. The default value `(200, 200)
 should work for fetal brains. While it shouldn't be necessary, increasing the
 values shouldn't do any harm, and would help compensate for larger brain sizes.
 
+#### `--keep-mask`
+
+Copy input mask file to output directory.
+
+`--keep-mask` is a workaround for using `pl-fetal-cp-surface-extract` as part of a
+_ChRIS_ pipeline. It eliminates the need for an extra _ts_ plugin step.
+
 ## Local Usage
 
 To get started with local command-line usage, use [Apptainer](https://apptainer.org/)

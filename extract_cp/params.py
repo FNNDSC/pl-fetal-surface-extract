@@ -15,6 +15,7 @@ class Parameters:
     mincmorph_iterations: int
     adapt_object_mesh: tuple[int, int, int]
     inflate_to_sphere_implicit: tuple[int, int]
+    keep_mask: bool
 
     def __post_init__(self):
         if not len(self.adapt_object_mesh) == 3:
@@ -28,13 +29,15 @@ class Parameters:
             side: SideStr,
             mincmorph_iterations: int,
             adapt_object_mesh: str,
-            inflate_to_sphere_implicit: str
+            inflate_to_sphere_implicit: str,
+            keep_mask: bool
     ) -> 'Parameters':
         return cls(
             side=side,
             mincmorph_iterations=mincmorph_iterations,
             adapt_object_mesh=_str2ints(adapt_object_mesh),
-            inflate_to_sphere_implicit=_str2ints(inflate_to_sphere_implicit)
+            inflate_to_sphere_implicit=_str2ints(inflate_to_sphere_implicit),
+            keep_mask=keep_mask
         )
 
     @classmethod
@@ -43,7 +46,8 @@ class Parameters:
             side=options.side,
             mincmorph_iterations=options.mincmorph_iterations,
             adapt_object_mesh=options.adapt_object_mesh,
-            inflate_to_sphere_implicit=options.inflate_to_sphere_implicit
+            inflate_to_sphere_implicit=options.inflate_to_sphere_implicit,
+            keep_mask=options.keep_mask
         )
 
 

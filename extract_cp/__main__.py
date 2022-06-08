@@ -26,6 +26,8 @@ parser.add_argument('--adapt_object_mesh', dest='adapt_object_mesh', type=str, d
 parser.add_argument('--inflate_to_sphere_implicit', dest='inflate_to_sphere_implicit', type=str, default='200,200',
                     help='Parameters for inflate_to_sphere_implicit. Larger values are necessary '
                          'for larger brain size.')
+parser.add_argument('-k', '--keep-mask', dest='keep_mask', action='store_true',
+                    help='Copy input mask file to output directory')
 parser.add_argument('--no-fail', dest='no_fail', action='store_true',
                     help='Exit normally even when failed to process a subject')
 parser.add_argument('-V', '--version', action='version',
