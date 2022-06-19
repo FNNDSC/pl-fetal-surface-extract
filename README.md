@@ -21,11 +21,31 @@ weeks of age.
 Polygonal surface mesh representations of brain hemispheres are useful for measuring cortical
 thickness, image registration, and quantitative regional analysis.
 
+## Marching Cubes
+
+We have evaluated two implementations of marching-cubes:
+
+- [scikit-image](https://github.com/FNNDSC/pl-fetal-cp-surface-extract)
+- [CIVET](https://github.com/FNNDSC/ep-sphere_mesh)
+
+We found that CIVET's implementation of the marching-cubes algorithm, `sphere_mesh`, is
+[more accurate](docs/compare_civet_skimage.md)
+than scikit-image's implementation, which requires FWHM blurring of the volume.
+Moreover, `sphere_mesh` guarantees a spherical topology.
+
+It is necessary to use the `-subsample` option for fetal brains to avoid
+"bridge" errors between tight (<1 voxel) sulcal walls.
+
 ## Surface Extraction Algorithm
 
 1. Proprocess mask using `mincmorph` to fill in disconnected voxels (improve mask quality)
 2. Marching-cubes -> spherical topology surface mesh with unknown number of triangles
 3. Sphere-to-sphere interpolation -> resample mesh to standard connectivity of 81,920 triangles, preserving morphology
+
+While the upstream
+[marching_cube.pl](https://github.com/aces/surface-extraction/blob/master/scripts/marching_cubes.pl.in)
+script uses ASP (`surface_fit`) post-processing to fully converge the surface to the volume boundary,
+without the extra step the accuracy is nonetheless sufficient.
 
 ## Installation
 
