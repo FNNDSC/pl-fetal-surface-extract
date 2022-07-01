@@ -93,8 +93,7 @@ jobs:
             localhost:5000/${{ steps.determine.outputs.dock_image }}
             docker.io/${{ steps.determine.outputs.dock_image }}
             ghcr.io/${{ steps.determine.outputs.dock_image }}
-          # if non-x86_84 architectures are supported, add them here
-          platforms: linux/amd64  #,linux/arm64,linux/ppc64le
+          platforms: linux/amd64,linux/arm64,linux/ppc64le
           push: true
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache
