@@ -41,6 +41,7 @@ It is necessary to use the `-subsample` option for fetal brains to avoid
 1. Proprocess mask using `mincmorph` to fill in disconnected voxels (improve mask quality)
 2. Marching-cubes -> spherical topology surface mesh with unknown number of triangles
 3. Sphere-to-sphere interpolation -> resample mesh to standard connectivity of 81,920 triangles, preserving morphology
+4. A little smoothing using `adapt_object_mesh`.
 
 While the upstream
 [marching_cube.pl](https://github.com/aces/surface-extraction/blob/master/scripts/marching_cubes.pl.in)
