@@ -1,5 +1,3 @@
 chris_plugin==0.0.17
-#pycivet==0.0.10
-# temporary workaround while PyPi.org/simple index is being refreshed
-https://files.pythonhosted.org/packages/71/fb/3a1fb2db67f7d77483f3a3c3a45d8f3d485c44798485e59ae1d69c59a08e/pycivet-0.0.10-py3-none-any.whl
+pycivet==0.0.10
 loguru==0.6.0
