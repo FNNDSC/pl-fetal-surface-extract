@@ -17,6 +17,8 @@ parser.add_argument('-s', '--side', default='auto', choices=SIDE_OPTIONS,
                     help='brain hemisphere side. "auto" => infer from file name')
 parser.add_argument('-p', '--pattern', default='**/*.mnc',
                     help='pattern for file names to include')
+parser.add_argument('--subsample', action='store_true',
+                    help='Use -subsample option for spehre_mesh, use with narrow sulci')
 parser.add_argument('--mincmorph-iterations', dest='mincmorph_iterations', type=int, default=5,
                     help='Number of mincmorph iterations. Mincmorph is a mask preprocessing step '
                          'which repairs disconnected voxels. A larger value may improve results '

@@ -19,7 +19,7 @@ def extract_surface(mask: Path, surface: Path, params: Parameters):
         with log_path.open('wb') as log:
             HemisphereMask(mask)\
                 .smoothen_using_mincmorph(iterations=params.mincmorph_iterations)\
-                .just_sphere_mesh(chosen_side, subsample=True)\
+                .just_sphere_mesh(chosen_side, subsample=params.subsample)\
                 .adapt_object_mesh(*params.adapt_object_mesh)\
                 .interpolate_with_sphere(chosen_side, *params.inflate_to_sphere_implicit)\
                 .save(surface, shell=__curry_log(log))

@@ -33,9 +33,6 @@ We found that CIVET's implementation of the marching-cubes algorithm, `sphere_me
 than scikit-image's implementation, which requires FWHM blurring of the volume.
 Moreover, `sphere_mesh` guarantees a spherical topology.
 
-It is necessary to use the `-subsample` option for fetal brains to avoid
-"bridge" errors between tight (<1 voxel) sulcal walls.
-
 ## Surface Extraction Algorithm
 
 1. Proprocess mask using `mincmorph` to fill in disconnected voxels (improve mask quality)
@@ -70,6 +67,11 @@ If the input directory contains multiple masks, they will all be processed
 individually and in parallel.
 
 ### Options
+
+#### `--subsample`
+
+It is necessary to use the `--subsample` option for fetal brains 29 GA
+and older to avoid "bridge" errors between narrow (<1 voxel) sulcal walls.
 
 #### `--mincmorph-iterations`
 
