@@ -90,7 +90,7 @@ Arguments to pass to `adapt_object_mesh`, which does mesh smoothing.
 Use a larger value if the results are bumpy/voxelated in appearance.
 
 ```shell
-extract_cp --adapt_object_mesh 1,100,1 /incoming /outgoing
+extract_cp --adapt_object_mesh 0,100,0,0 /incoming /outgoing
 ```
 
 #### `--inflate_to_sphere_implicit`

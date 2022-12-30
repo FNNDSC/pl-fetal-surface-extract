@@ -13,14 +13,14 @@ class Parameters:
     """
     side: SideStr
     mincmorph_iterations: int
-    adapt_object_mesh: tuple[int, int, int]
+    adapt_object_mesh: tuple[int, int, int, int]
     inflate_to_sphere_implicit: tuple[int, int]
     keep_mask: bool
     subsample: bool
 
     def __post_init__(self):
-        if not len(self.adapt_object_mesh) == 3:
-            raise ValueError('adapt_object_mesh takes 3 parameters')
+        if not len(self.adapt_object_mesh) == 4:
+            raise ValueError('adapt_object_mesh takes 4 parameters')
         if not len(self.inflate_to_sphere_implicit) == 2:
             raise ValueError('inflate_to_sphere_implicit takes 2 parameters')
 

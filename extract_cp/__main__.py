@@ -23,7 +23,7 @@ parser.add_argument('--mincmorph-iterations', dest='mincmorph_iterations', type=
                     help='Number of mincmorph iterations. Mincmorph is a mask preprocessing step '
                          'which repairs disconnected voxels. A larger value may improve results '
                          'for messy masks, but at the cost of accuracy.')
-parser.add_argument('--adapt_object_mesh', dest='adapt_object_mesh', type=str, default='1,50,1',
+parser.add_argument('--adapt_object_mesh', dest='adapt_object_mesh', type=str, default='0,50,0,0',
                     help='Parameters for adapt_object_mesh, which does mesh smoothing.')
 parser.add_argument('--inflate_to_sphere_implicit', dest='inflate_to_sphere_implicit', type=str, default='200,200',
                     help='Parameters for inflate_to_sphere_implicit. Larger values are necessary '
