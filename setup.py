@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name='extract_cp',
-    version='1.2.0',
+    version='1.2.1',
     description='Fetal brain MRI CP surface extraction using CIVET marching-cubes',
     author='Jennings Zhang',
     author_email='Jennings.Zhang@childrens.harvard.edu',

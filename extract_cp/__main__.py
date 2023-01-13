@@ -33,7 +33,7 @@ parser.add_argument('-k', '--keep-mask', dest='keep_mask', action='store_true',
 parser.add_argument('--no-fail', dest='no_fail', action='store_true',
                     help='Exit normally even when failed to process a subject')
 parser.add_argument('-V', '--version', action='version',
-                    version=f'$(prog)s {__version__}')
+                    version=f'%(prog)s {__version__}')
 
 
 @chris_plugin(
