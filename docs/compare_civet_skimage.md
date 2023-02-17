@@ -1,5 +1,5 @@
 Brief comparison of marching-cubes implementations between
-[scikit-image](https://github.com/FNNDSC/pl-fetal-cp-surface-extract)
+[scikit-image](https://github.com/FNNDSC/pl-fetal-surface-extract)
 and [CIVET](https://github.com/FNNDSC/ep-sphere_mesh).
 
 Cost function is mean
