@@ -18,6 +18,9 @@ from extract_cp.predict_smth import predict_aom
 
 _LOG_PREFIX = b'[' + os.path.basename(__file__).encode(encoding='utf-8') + b']'
 
+BAD_SMTHERR = 2.0
+BAD_DISTERR = 2.0
+
 
 def extract_surface(mask: Path, surface: Path, params: Parameters):
     log_path = surface.with_suffix('.extraction.log')
@@ -44,6 +47,7 @@ class StepOutcome(TypedDict):
     name: str
     disterr_abs_max: float
     smtherr_mean: float
+    smtherr_max: float
 
 
 @dataclasses.dataclass(frozen=True)
@@ -71,8 +75,19 @@ class _ExtractSurface:
         """
         Finishing touches
         """
+        self._check_qc_bad()
         self.output_sink.flush()
         self._write_steps()
+
+    def _check_qc_bad(self):
+        """
+        If any final QC measurement is worse than a threshold, create a ".bad" file.
+        """
+        last_outcome = self.outcomes[-1]
+        if last_outcome['smtherr_max'] >= BAD_SMTHERR:
+            self._smtherr_file.with_suffix('.bad').touch()
+        if last_outcome['disterr_abs_max'] >= BAD_DISTERR:
+            self._disterr_file.with_suffix('.bad').touch()
 
     def _marching_cubes_until_disterr_ok(self):
         """
@@ -153,10 +168,13 @@ class _ExtractSurface:
         (Re)-calculate smtherr and disterr, writing both data to files and append
         a summary to ``self.outcomes``. This summary is also returned.
         """
+        smtherr_data = self._load_smtherr()
+        disterr_data = self._load_surfdisterr()
         outcome = StepOutcome(
             name=name,
-            smtherr_mean=self._smtherr_mean(),
-            disterr_abs_max=self._disterr_abs_max()
+            disterr_abs_max=float(np.abs(disterr_data).max()),
+            smtherr_mean=float(smtherr_data.mean()),
+            smtherr_max=float(smtherr_data.max())
         )
         self.outcomes.append(outcome)
         return outcome
@@ -172,15 +190,6 @@ class _ExtractSurface:
     def _load_surfdisterr(self) -> npt.NDArray[np.float32]:
         self._write_surfdisterr()
         return np.loadtxt(self._disterr_file, dtype=np.float32)
-
-    def _disterr_abs_max(self) -> float:
-        data = self._load_surfdisterr()
-        return float(np.abs(data).max())
-
-    def _smtherr_mean(self) -> float:
-        data = self._load_smtherr()
-
-        return float(data.mean())
 
     def _write_steps(self):
         with self._outcomes_file.open('w') as f:
