@@ -63,6 +63,7 @@ class _ExtractSurface:
         See README.md for explanation of this algorithm.
         """
         self._marching_cubes_until_disterr_ok()
+        self._iterpolate_with_sphere()
         self._smooth_as_needed()
         self.conclude()
 
@@ -104,6 +105,24 @@ class _ExtractSurface:
         smth_first = first_outcome['smtherr_mean']
         smth_second = second_outcome['smtherr_mean']
         self._message('affected mean(smtherr): ', self._percent_change(smth_first, smth_second))
+
+    def _iterpolate_with_sphere(self):
+        """
+        Perform sphere-to-sphere interpolation, resampling the surface to have standard connectivity
+        (a consistent 81,920 triangles).
+
+        This should happen *before* smoothing because the resampling somewhat smoothens the surface.
+        """
+        current_smth = self.outcomes[-1]['smtherr_mean']
+        IrregularSurface(self.surface)\
+            .interpolate_with_sphere(self.side, *self.params.inflate_to_sphere_implicit)\
+            .save(self.surface, shell=self._logged_runner)
+        inflate_params = map(str, self.params.inflate_to_sphere_implicit)
+        step_name = 'sphere-to-sphere interpolation ::: ' \
+                    f'inflate_to_sphere_implicit {" ".join(inflate_params)}'
+        outcome = self._evaluate(step_name)
+        new_smth = outcome['smtherr_mean']
+        self._message('mean(smtherr): ', self._percent_change(current_smth, new_smth))
 
     def _smooth_as_needed(self):
         """

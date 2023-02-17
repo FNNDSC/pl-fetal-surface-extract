@@ -39,9 +39,9 @@ Moreover, `sphere_mesh` guarantees a spherical topology.
 2. Marching-cubes -> spherical topology surface mesh with unknown number of triangles
 3. Calculate distance error
 4. _If_ maximum distance error is too large, _then_ redo marching-cubes with subsampling
-5. Calculate smoothness error
-6. Run `adapt_object_mesh` to achieve desired smoothness. Number of iterations is predicted by a regression model
-7. Sphere-to-sphere interpolation -> resample mesh to standard connectivity of 81,920 triangles, preserving morphology
+5. Sphere-to-sphere interpolation -> resample mesh to standard connectivity of 81,920 triangles, preserving morphology
+6. Calculate smoothness error
+7. Run `adapt_object_mesh` to achieve desired smoothness. Number of iterations is predicted by a regression model
 
 ### Estimation of: How much smoothing?
 
