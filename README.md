@@ -37,13 +37,19 @@ Moreover, `sphere_mesh` guarantees a spherical topology.
 
 1. Preprocess mask using `mincmorph` to fill in disconnected voxels (improve mask quality)
 2. Marching-cubes -> spherical topology surface mesh with unknown number of triangles
-3. Sphere-to-sphere interpolation -> resample mesh to standard connectivity of 81,920 triangles, preserving morphology
-4. Calculate distance error
-5. _If_ maximum distance error is too large, _then_ redo marching-cubes with subsampling.
-6. Calculate smoothness error
-7. Run `adapt_object_mesh` to achieve desired smoothness. Number of iterations is predicted by a linear model.
-8. Run `mincresample` on the mask with trilinear interpolation to increase mask resolution.
-9. Run `surface_fit` to fully converge surface to mask boundary.
+3. Calculate distance error
+4. _If_ maximum distance error is too large, _then_ redo marching-cubes with subsampling
+5. Calculate smoothness error
+6. Run `adapt_object_mesh` to achieve desired smoothness. Number of iterations is predicted by a regression model
+7. Sphere-to-sphere interpolation -> resample mesh to standard connectivity of 81,920 triangles, preserving morphology
+
+### Estimation of: How much smoothing?
+
+We developed a model which predicts the number of `adapt_object_mesh` smoothing iterations necessary, given a desired smoothness error threshold.
+The model was created from the experiment described here:
+
+- https://github.com/FNNDSC/voxelation-error-datalad/blob/90fd86aa2e1a280cbda6a210c802236e34b76457/README.md
+- https://github.com/FNNDSC/voxelation-error-datalad/blob/90fd86aa2e1a280cbda6a210c802236e34b76457/5_notebook/taubin_vs_mean_smtherr.ipynb
 
 ## Pipeline
 
@@ -82,17 +88,6 @@ If the input directory contains multiple masks, they will all be processed
 individually and in parallel.
 
 ### Options
-
-#### `--mincmorph-iterations`
-
-Number of `mincmorph` iterations to perform on the mask before marching-cubes.
-Use a larger value as a workaround for masks which have missing voxels. However,
-extremely bad masks will require external correction, for instance, using `mincdefrag`.
-_Garbage in, garbage out_.
-
-```shell
-extract_cp --mincmorph-iterations 10 /incoming /outgoing
-```
 
 #### `--inflate_to_sphere_implicit`
 

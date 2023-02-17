@@ -21,5 +21,11 @@ setup(
         'Topic :: Scientific/Engineering',
         'Topic :: Scientific/Engineering :: Bio-Informatics',
         'Topic :: Scientific/Engineering :: Medical Science Apps.'
-    ]
+    ],
+    extras_require={
+        'none': [],
+        'dev': [
+            'pytest~=7.1'
+        ]
+    }
 )

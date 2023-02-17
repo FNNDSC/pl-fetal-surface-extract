@@ -5,7 +5,7 @@ import shlex
 import shutil
 from pathlib import Path
 from typing import Optional, Sequence, BinaryIO, TypedDict
-from civet.extraction.hemisphere import Side, HemisphereMask
+from civet.extraction.hemisphere import Side, HemisphereMask, IrregularSurface
 import subprocess as sp
 from loguru import logger
 
@@ -14,6 +14,7 @@ import numpy.typing as npt
 
 from extract_cp.params import SideStr, SIDE_OPTIONS, Parameters
 from extract_cp.qc import surfdisterr, smtherr
+from extract_cp.predict_smth import predict_aom
 
 _LOG_PREFIX = b'[' + os.path.basename(__file__).encode(encoding='utf-8') + b']'
 
@@ -47,6 +48,9 @@ class StepOutcome(TypedDict):
 
 @dataclasses.dataclass(frozen=True)
 class _ExtractSurface:
+    """
+    Defines the procedures for surface extraction. Every method is riddled with side effects...
+    """
     mask: Path
     surface: Path
     side: Side
@@ -55,7 +59,11 @@ class _ExtractSurface:
     outcomes: list[StepOutcome] = dataclasses.field(default_factory=list)
 
     def run(self):
+        """
+        See README.md for explanation of this algorithm.
+        """
         self._marching_cubes_until_disterr_ok()
+        self._smooth_as_needed()
         self.conclude()
 
     def conclude(self):
@@ -86,10 +94,8 @@ class _ExtractSurface:
 
         second_outcome = self._evaluate('marching-cubes (sphere_mesh) WITH SUBSAMPLING')
         second_disterr = second_outcome['disterr_abs_max']
-        percent_change = (second_disterr - disterr) / disterr * 100
-        self._message('marching-cubes with subsampling improvement: '
-                      f'max(surfdisterr) {disterr:.3f} -> {second_disterr:.3f} '
-                      f'({percent_change:.1g}% change)')
+        self._message('marching-cubes with subsampling improvement: max(surfdisterr) ',
+                      self._percent_change(disterr, second_disterr))
 
         if second_disterr > disterr:
             self._message('!!!WARNING!!! marching-cubes with subsampling produced a surface '
@@ -97,9 +103,26 @@ class _ExtractSurface:
 
         smth_first = first_outcome['smtherr_mean']
         smth_second = second_outcome['smtherr_mean']
-        smth_percent_change = (smth_second - smth_first) / smth_first * 100
-        self._message(f'affected mean(smtherr): {smth_first:.3f} -> {smth_second:.3f} '
-                      f'({smth_percent_change:.1g}% change)')
+        self._message('affected mean(smtherr): ', self._percent_change(smth_first, smth_second))
+
+    def _smooth_as_needed(self):
+        """
+        Apply a predicted number of iterations of ``adapt_object_mesh``.
+        """
+        current_smth = self.outcomes[-1]['smtherr_mean']
+        n_smooth = predict_aom(current_smth, self.params.target_smoothness, self.params.max_smooth_iterations)
+        if n_smooth <= 0:
+            self._message('smoothing not needed')
+            return
+        self._adapt_object_mesh(n_smooth)
+        outcome = self._evaluate(f'adapt_object_mesh 0 {n_smooth} 0 0')
+        new_smth = outcome['smtherr_mean']
+        self._message('mean(smtherr): ', self._percent_change(current_smth, new_smth))
+
+    def _adapt_object_mesh(self, n_smooth: int):
+        IrregularSurface(self.surface)\
+            .adapt_object_mesh(0, n_smooth, 0, 0)\
+            .save(self.surface, shell=self._logged_runner)
 
     def _marching_cubes(self, subsample: bool):
         HemisphereMask(self.mask)\
@@ -137,6 +160,7 @@ class _ExtractSurface:
 
     def _smtherr_mean(self) -> float:
         data = self._load_smtherr()
+
         return float(data.mean())
 
     def _write_steps(self):
@@ -167,6 +191,12 @@ class _ExtractSurface:
             sp.run(cmd, stderr=self.output_sink, stdout=self.output_sink, check=True)
 
         return run_with_log
+
+    @staticmethod
+    def _percent_change(a: float, b: float) -> str:
+        percent = (b - a) / a
+        plus = '+' if percent > 0 else ''
+        return f'{a:.3f} -> {b:.3f} ({plus}{percent:.1%} change)'
 
     def _message(self, *args):
         self.output_sink.write(_LOG_PREFIX)
