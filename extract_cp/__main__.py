@@ -13,27 +13,29 @@ from extract_cp.extract_surface import extract_surface
 
 parser = ArgumentParser(description='Fetal brain MRI CP inner surface extraction',
                         formatter_class=ArgumentDefaultsHelpFormatter)
+# -------------------- Input and Output Options --------------------
 parser.add_argument('-s', '--side', default='auto', choices=SIDE_OPTIONS,
                     help='brain hemisphere side. "auto" => infer from file name')
 parser.add_argument('-p', '--pattern', default='**/*.mnc',
                     help='pattern for file names to include')
-parser.add_argument('--subsample', action='store_true',
-                    help='Use -subsample option for spehre_mesh, use with narrow sulci')
-parser.add_argument('--mincmorph-iterations', dest='mincmorph_iterations', type=int, default=5,
-                    help='Number of mincmorph iterations. Mincmorph is a mask preprocessing step '
-                         'which repairs disconnected voxels. A larger value may improve results '
-                         'for messy masks, but at the cost of accuracy.')
-parser.add_argument('--adapt_object_mesh', dest='adapt_object_mesh', type=str, default='0,50,0,0',
-                    help='Parameters for adapt_object_mesh, which does mesh smoothing.')
-parser.add_argument('--inflate_to_sphere_implicit', dest='inflate_to_sphere_implicit', type=str, default='200,200',
-                    help='Parameters for inflate_to_sphere_implicit. Larger values are necessary '
-                         'for larger brain size.')
+parser.add_argument('-t', '--threads', type=int, default=0,
+                    help='number of threads to use (pass 0 to use number of visible CPU cores)')
 parser.add_argument('-k', '--keep-mask', dest='keep_mask', action='store_true',
                     help='Copy input mask file to output directory')
 parser.add_argument('--no-fail', dest='no_fail', action='store_true',
                     help='Exit normally even when failed to process a subject')
 parser.add_argument('-V', '--version', action='version',
-                    version=f'$(prog)s {__version__}')
+                    version=f'%(prog)s {__version__}')
+# --------------------   Algorithm Parameters   --------------------
+parser.add_argument('--inflate_to_sphere_implicit', dest='inflate_to_sphere_implicit', type=str, default='500,500',
+                    help='Parameters for inflate_to_sphere_implicit. Larger values are necessary '
+                         'for larger brain size.')
+parser.add_argument('--distance-threshold', dest='distance_threshold', default=1.0, type=float,
+                    help='Maximum distance error to allow without using subsampling')
+parser.add_argument('--target-smoothness', dest='target_smoothness', type=float, default=0.2,
+                    help='Target mean smoothness error for how many iterations of adapt_object_mesh to perform.')
+parser.add_argument('--max-smooth-iterations', dest='max_smooth_iterations', type=int, default=200,
+                    help='Maximum allowed number of smoothing iterations using adapt_object_mesh.')
 
 
 @chris_plugin(
@@ -49,7 +51,8 @@ def main(options: Namespace, inputdir: Path, outputdir: Path):
     print(DISPLAY_TITLE, file=sys.stderr, flush=True)
     print(params, file=sys.stderr, flush=True)
 
-    with ThreadPoolExecutor(max_workers=len(os.sched_getaffinity(0))) as pool:
+    proc = len(os.sched_getaffinity(0)) if options.threads <= 0 else options.threads
+    with ThreadPoolExecutor(max_workers=proc) as pool:
         mapper = PathMapper.file_mapper(inputdir, outputdir, glob=options.pattern, suffix='._81920.obj')
         results = pool.map(lambda t: extract_surface(*t, params=params), mapper)
 

@@ -35,15 +35,30 @@ Moreover, `sphere_mesh` guarantees a spherical topology.
 
 ## Surface Extraction Algorithm
 
-1. Proprocess mask using `mincmorph` to fill in disconnected voxels (improve mask quality)
+1. Preprocess mask using `mincmorph` to fill in disconnected voxels (improve mask quality)
 2. Marching-cubes -> spherical topology surface mesh with unknown number of triangles
 3. Sphere-to-sphere interpolation -> resample mesh to standard connectivity of 81,920 triangles, preserving morphology
-4. A little smoothing using `adapt_object_mesh`.
+4. Calculate distance error
+5. _If_ maximum distance error is too large, _then_ redo marching-cubes with subsampling.
+6. Calculate smoothness error
+7. Run `adapt_object_mesh` to achieve desired smoothness. Number of iterations is predicted by a linear model.
+8. Run `mincresample` on the mask with trilinear interpolation to increase mask resolution.
+9. Run `surface_fit` to fully converge surface to mask boundary.
 
+## Pipeline
+
+1. https://github.com/FNNDSC/ep-premc-mincmorph
+2. https://github.com/FNNDSC/pl-nums2mask
+3. https://github.com/FNNDSC/pl-subdiv-minc TODO
+4. pl-fetal-cp-surface-extract
+5. pl-extracted-surface-asp TODO
+
+<!--
 While the upstream
 [marching_cube.pl](https://github.com/aces/surface-extraction/blob/master/scripts/marching_cubes.pl.in)
 script uses ASP (`surface_fit`) post-processing to fully converge the surface to the volume boundary,
 without the extra step the accuracy is nonetheless sufficient.
+-->
 
 ## Installation
 
@@ -68,11 +83,6 @@ individually and in parallel.
 
 ### Options
 
-#### `--subsample`
-
-It is necessary to use the `--subsample` option for fetal brains 29 GA
-and older to avoid "bridge" errors between narrow (<1 voxel) sulcal walls.
-
 #### `--mincmorph-iterations`
 
 Number of `mincmorph` iterations to perform on the mask before marching-cubes.
@@ -82,15 +92,6 @@ _Garbage in, garbage out_.
 
 ```shell
 extract_cp --mincmorph-iterations 10 /incoming /outgoing
-```
-
-#### `--adapt_object_mesh`
-
-Arguments to pass to `adapt_object_mesh`, which does mesh smoothing.
-Use a larger value if the results are bumpy/voxelated in appearance.
-
-```shell
-extract_cp --adapt_object_mesh 0,100,0,0 /incoming /outgoing
 ```
 
 #### `--inflate_to_sphere_implicit`
