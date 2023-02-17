@@ -20,7 +20,7 @@ jobs:
   build:
     name: Build
     if: github.event_name == 'push' || github.event_name == 'release'
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
 
     # A local registry helps us reuse the built image between steps
     services:
@@ -33,7 +33,7 @@ jobs:
       - name: Get git tag
         id: git_info
         if: startsWith(github.ref, 'refs/tags/')
-        run: echo "::set-output name=tag::${GITHUB_REF##*/}"
+        run: echo "tag=${GITHUB_REF##*/}" >> $GITHUB_OUTPUT
       - name: Get project info
         id: determine
         env:
@@ -42,49 +42,45 @@ jobs:
           repo="${GITHUB_REPOSITORY,,}"  # to lower case
           # if build triggered by tag, use tag name
           tag="${git_tag:-latest}"
-
           # if tag is a version number prefixed by 'v', remove the 'v'
           if [[ "$tag" =~ ^v[0-9].* ]]; then
             tag="${tag:1}"
           fi
-
           dock_image=$repo:$tag
           echo $dock_image
-          echo "::set-output name=dock_image::$dock_image"
-          echo "::set-output name=repo::$repo"
-
-      - uses: actions/checkout@v2
+          echo "dock_image=$dock_image" >> $GITHUB_OUTPUT
+          echo "repo=$repo" >> $GITHUB_OUTPUT
+      - uses: actions/checkout@v3
         # QEMU is used for non-x86_64 builds
-      - uses: docker/setup-qemu-action@v1
+      - uses: docker/setup-qemu-action@v2
         # buildx adds additional features to docker build
-      - uses: docker/setup-buildx-action@v1
+      - uses: docker/setup-buildx-action@v2
         with:
           driver-opts: network=host
         # cache slightly improves rebuild time
       - name: Cache Docker layers
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: /tmp/.buildx-cache
           key: ${{ runner.os }}-buildx-${{ github.sha }}
           restore-keys: |
             ${{ runner.os }}-buildx-
-
       - name: Login to DockerHub
         id: dockerhub_login
-        uses: docker/login-action@v1
+        uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
           
       - name: Login to GitHub Container Registry
-        uses: docker/login-action@v1 
+        uses: docker/login-action@v2
         with:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build and push
-        uses: docker/build-push-action@v2
+        uses: docker/build-push-action@v3
         id: docker_build
         with:
           context: .
@@ -105,10 +101,9 @@ jobs:
           dock_image=${{ steps.determine.outputs.dock_image }}
           docker run --rm localhost:5000/$dock_image chris_plugin_info > /tmp/description.json
           jq < /tmp/description.json  # pretty print in log
-          echo "::set-output name=title::$(jq -r '.title' < /tmp/description.json)"
-
+          echo "title=$(jq -r '.title' < /tmp/description.json)" >> $GITHUB_OUTPUT
       - name: Update DockerHub description
-        uses: peter-evans/dockerhub-description@v2
+        uses: peter-evans/dockerhub-description@v3
         continue-on-error: true  # it is not crucial that this works
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
@@ -118,7 +113,7 @@ jobs:
           repository: ${{ steps.determine.outputs.repo }}
 
       - name: Upload to ChRIS Store
-        if: github.event_name == 'release'
+        if: steps.git_info.outcome != 'skipped'
         uses: FNNDSC/chrisstore-action@master
         with:
           descriptor_file: /tmp/description.json
