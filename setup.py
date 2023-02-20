@@ -1,4 +1,4 @@
-from setuptools import setup
+from setuptools import setup, find_packages
 
 setup(
     name='extract_cp',
@@ -6,8 +6,8 @@ setup(
     description='Fetal brain MRI CP surface extraction using CIVET marching-cubes',
     author='Jennings Zhang',
     author_email='Jennings.Zhang@childrens.harvard.edu',
-    url='https://github.com/FNNDSC/pl-fetal-cp-surface-extract',
-    packages=['extract_cp'],
+    url='https://github.com/FNNDSC/pl-fetal-surface-extract',
+    packages=find_packages(exclude=['tests']),
     install_requires=['chris_plugin', 'loguru', 'pycivet', 'pybicpl', 'numpy'],
     license='MIT',
     entry_points={
