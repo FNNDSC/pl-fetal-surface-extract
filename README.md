@@ -48,8 +48,7 @@ Moreover, `sphere_mesh` guarantees a spherical topology.
 We developed a model which predicts the number of `adapt_object_mesh` smoothing iterations necessary, given a desired smoothness error threshold.
 The model was created from the experiment described here:
 
-- https://github.com/FNNDSC/voxelation-error-datalad/blob/90fd86aa2e1a280cbda6a210c802236e34b76457/README.md
-- https://github.com/FNNDSC/voxelation-error-datalad/blob/90fd86aa2e1a280cbda6a210c802236e34b76457/5_notebook/taubin_vs_mean_smtherr.ipynb
+- https://github.com/FNNDSC/smoothness-error-datalad/blob/94b414dc019ee236485abb8e0af646fca1219dac/5_notebook/smoothing_vs_mean_smtherr.ipynb
 
 ## Pipeline
 

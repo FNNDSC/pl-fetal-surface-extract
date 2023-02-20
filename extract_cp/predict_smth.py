@@ -7,9 +7,9 @@ https://github.com/FNNDSC/voxelation-error-datalad/blob/90fd86aa2e1a280cbda6a210
 # TODO RERUN THE MODEL USING A TIGHTER STARTING SURFACE
 # modeled MAX_SMTHERR is much smaller than actuals
 
-A = 3.63462484
-H = -9.62391412
-K = 0.05865665
+A = 10.93738233
+H = -14.53134114
+K = 0.01999569
 
 
 def predict_aom(current: float, target: float, max_iters: int = 200) -> int:

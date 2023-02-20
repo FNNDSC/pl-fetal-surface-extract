@@ -14,7 +14,7 @@ def test_no_smoothing_needed():
 
 
 def test_across_horizontal_asymptote():
-    assert predict_aom(0.30, 0.001, max_iters=99) > 90
+    assert predict_aom(0.30, 0.00001, max_iters=99) > 50
 
 
 def test_across_vertical_asymptote():
