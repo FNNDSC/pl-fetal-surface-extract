@@ -241,9 +241,9 @@ def __pick_side(mask: Path, side: SideStr) -> Optional[Side]:
         return Side.RIGHT
     if side == 'auto':
         path = str(mask).lower()
-        if 'left' in path:
+        if 'left' in path or mask.name.startswith('lh.'):
             return Side.LEFT
-        if 'right' in path:
+        if 'right' in path or mask.name.startswith('rh.'):
             return Side.RIGHT
         raise ValueError(f'Substring "left" nor "right" found in: {path}')
     if side == 'none':
