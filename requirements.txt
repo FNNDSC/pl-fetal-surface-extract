@@ -2,4 +2,4 @@ chris_plugin==0.3.1
 pycivet==0.1.2
 loguru==0.6.0
 pybicpl==0.5.1
-numpy~=1.22
+numpy~=1.26.0
