@@ -1,4 +1,4 @@
-chris_plugin==0.1.2
+chris_plugin==0.3.1
 pycivet==0.1.2
 loguru==0.6.0
 pybicpl==0.5.1

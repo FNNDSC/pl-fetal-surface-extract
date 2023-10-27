@@ -18,7 +18,7 @@ parser.add_argument('-s', '--side', default='auto', choices=SIDE_OPTIONS,
                     help='brain hemisphere side. "auto" => infer from file name')
 parser.add_argument('-p', '--pattern', default='**/*.mnc',
                     help='pattern for file names to include')
-parser.add_argument('-t', '--threads', type=int, default=0,
+parser.add_argument('-J', '--threads', type=int, default=0,
                     help='number of threads to use (pass 0 to use number of visible CPU cores)')
 parser.add_argument('-k', '--keep-mask', dest='keep_mask', action='store_true',
                     help='Copy input mask file to output directory')

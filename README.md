@@ -52,11 +52,9 @@ The model was created from the experiment described here:
 
 ## Pipeline
 
-1. https://github.com/FNNDSC/ep-premc-mincmorph
-2. https://github.com/FNNDSC/pl-nums2mask
-3. https://github.com/FNNDSC/pl-subdiv-minc TODO
-4. pl-fetal-surface-extract
-5. pl-extracted-surface-asp TODO
+It is recommended to use the
+[Fetal Brain MRI Surface Extraction](https://github.com/FNNDSC/Fetal_Brain_MRI_Surface_Extraction_Pipeline)
+_ChRIS_ pipeline.
 
 <!--
 While the upstream
@@ -69,8 +67,6 @@ without the extra step the accuracy is nonetheless sufficient.
 
 `pl-fetal-surface-extract` is a _[ChRIS](https://chrisproject.org/) plugin_, meaning it can
 run from either within _ChRIS_ or the command-line.
-
-[![Get it from chrisstore.co](https://raw.githubusercontent.com/FNNDSC/ChRIS_store_ui/963938c241636e4c3dc4753ee1327f56cb82d8b5/src/assets/public/badges/light.svg)](https://chrisstore.co/plugin/pl-fetal-surface-extract)
 
 ## Usage
 
@@ -120,12 +116,7 @@ apptainer exec docker://fnndsc/pl-fetal-surface-extract extract_cp --help
 
 ### Before `pl-fetal-surface-extract`
 
-- [`pl-nums2mask`](https://chrisstore.co/plugin/pl-nums2mask): create input masks
-
-### After `pl-fetal-surface-extract`
-
-- [`pl-surfdisterr`](https://chrisstore.co/plugin/pl-surfdisterr): QC
-- [`pl-smoothness-error`](https://chrisstore.co/plugin/pl-smoothness-error): QC
+- [`pl-nums2mask`](https://github.com/FNNDSC/pl-nums2mask): create input masks
 
 ## Development
 
