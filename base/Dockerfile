@@ -42,7 +42,7 @@ RUN --mount=target=/var/lib/apt/lists,type=cache,sharing=locked \
     && apt-get -y --no-install-recommends install perl
 
 COPY --from=builder /microminc /opt/microminc
-ENV PATH=/opt/microminc/bin:$PATH \
+ENV PATH=/opt/conda/bin:/opt/microminc/bin:$PATH \
     LD_LIBRARY_PATH=/opt/microminc/lib:$LD_LIBRARY_PATH \
     MINC_FORCE_V2=1 MINC_COMPRESS=4 VOLUME_CACHE_THRESHOLD=-1 \
     MNI_DATAPATH=/opt/microminc/share \
