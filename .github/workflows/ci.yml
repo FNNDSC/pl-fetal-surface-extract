@@ -29,7 +29,11 @@ jobs:
         run: |
           import os
           import itertools
-          
+
+          def join_tag(t):
+            registry, repo, tag = t
+            return f'{registry}/{repo}:{tag}'.lower()
+
           registries = ['docker.io', 'ghcr.io']
           repos = ['${{ github.repository }}']
           if '${{ github.ref_type }}' == 'branch':
@@ -41,16 +45,17 @@ jobs:
           else:
               tags = []
 
-          def join_tag(t):
-              registry, repo, tag = t
-              return f'{registry}/{repo}:{tag}'.lower()
+          if '${{ github.ref_type }}' == 'tag':
+              local_tag = join_tag(('ghcr.io', '${{ github.repository }}', version))
+          else:
+              local_tag = join_tag(('localhost', '${{ github.repository }}', 'latest'))
 
           product = itertools.product(registries, repos, tags)
           tags_csv = ','.join(map(join_tag, product))
           outputs = {
               'tags_csv' : tags_csv,
               'push'     : 'true' if tags_csv else 'false',
-              'local_tag': join_tag(('localhost', '${{ github.repository }}', 'latest'))
+              'local_tag': local_tag
           }
           with open(os.environ['GITHUB_OUTPUT'], 'a') as out:
               for k, v in outputs.items():
