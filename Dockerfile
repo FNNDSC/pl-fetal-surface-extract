@@ -1,5 +1,4 @@
-# warning: unofficial base image is not stable and may change in the future!
-FROM docker.io/fnndsc/mni-conda-base:unofficial
+FROM docker.io/fnndsc/pl-fetal-surface-extract:base-1
 
 LABEL org.opencontainers.image.authors="Jennings Zhang <Jennings.Zhang@childrens.harvard.edu>" \
       org.opencontainers.image.title="pl-fetal-surface-extract" \
