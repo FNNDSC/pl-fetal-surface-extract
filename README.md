@@ -97,6 +97,24 @@ Copy input mask file to output directory.
 `--keep-mask` is a workaround for using `pl-fetal-surface-extract` as part of a
 _ChRIS_ pipeline. It eliminates the need for an extra _ts_ plugin step.
 
+#### `--distance-threshold`
+
+Set acceptable maximum distance error.
+
+Without subsampling, "sulci bridge" errors can happen.
+
+![Sulci bridge error](img/bridge_error.png)
+
+This error can be detected by large distance error. If distance error exceeds the distance threshold, then we rerun marching cubes with subsampling enabled.
+
+#### `--target-smoothness`
+
+Set target mean smoothness error.
+
+![Low quality surface](img/smoothness_error.png)
+
+The result of marching cubes, especially with subsampling enabled, can be poor quality. Taubin smoothing is applied to improve surface quality. The number of smoothing iterations is decided by the value for target smoothness.
+
 ## Local Usage
 
 To get started with local command-line usage, use [Apptainer](https://apptainer.org/)

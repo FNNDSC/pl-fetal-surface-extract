@@ -30,7 +30,7 @@ parser.add_argument('-V', '--version', action='version',
 parser.add_argument('--inflate_to_sphere_implicit', dest='inflate_to_sphere_implicit', type=str, default='500,500',
                     help='Parameters for inflate_to_sphere_implicit. Larger values are necessary '
                          'for larger brain size.')
-parser.add_argument('--distance-threshold', dest='distance_threshold', default=1.0, type=float,
+parser.add_argument('--distance-threshold', dest='distance_threshold', default=0.6, type=float,
                     help='Maximum distance error to allow without using subsampling')
 parser.add_argument('--target-smoothness', dest='target_smoothness', type=float, default=0.2,
                     help='Target mean smoothness error for how many iterations of adapt_object_mesh to perform.')

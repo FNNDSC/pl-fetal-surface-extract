@@ -18,8 +18,8 @@ from extract_cp.predict_smth import predict_aom
 
 _LOG_PREFIX = b'[' + os.path.basename(__file__).encode(encoding='utf-8') + b']'
 
-BAD_SMTHERR = 2.0
-BAD_DISTERR = 2.0
+BAD_SMTHERR = 10.0
+BAD_DISTERR = 0.6
 
 
 def extract_surface(mask: Path, surface: Path, params: Parameters):
